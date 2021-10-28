@@ -22,6 +22,9 @@
     },
     "products": {
       "collection": "products"
+    },
+    "member": {
+      "model": "members"
     }
   }
 }
