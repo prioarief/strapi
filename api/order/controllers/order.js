@@ -48,4 +48,16 @@ module.exports = {
       console.log(error);
     }
   },
+  async callback(ctx) {
+    try {
+      const { body } = ctx.request;
+      console.log(body);
+
+      ctx.status = 200;
+      ctx.body = { msg: "Hello" };
+      return ctx;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };

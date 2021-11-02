@@ -41,6 +41,14 @@
       }
     },
     {
+      "method": "POST",
+      "path": "/orders/callback-pg",
+      "handler": "order.callback",
+      "config": {
+        "policies": []
+      }
+    },
+    {
       "method": "PUT",
       "path": "/orders/:id",
       "handler": "order.update",
