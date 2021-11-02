@@ -34,6 +34,7 @@ module.exports = {
           email,
         },
       };
+      // console.log(total_amount);
 
       const hit = await axios.post(env("MIDTRANS_SANDBOX_URL"), data, {
         headers: {
@@ -45,7 +46,9 @@ module.exports = {
       ctx.body = { msg: hit.data };
       return ctx;
     } catch (error) {
-      console.log(error);
+      ctx.status = 400;
+      ctx.body = { msg: error.response.data.error_messages[0] };
+      return ctx;
     }
   },
   async callback(ctx) {
