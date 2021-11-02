@@ -1,30 +1,51 @@
-'use strict';
-const { parseMultipartData, sanitizeEntity } = require('strapi-utils');
-
+"use strict";
+const { env } = require("strapi-utils");
+const { default: axios } = require("axios");
 /**
  * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#core-controllers)
  * to customize this controller
  */
 
 module.exports = {
-    async pay(ctx) {
-        const { body } = ctx.request;
-        console.log(body);
-    
-        let entity;
-        // if (ctx.is('multipart')) {
-        //   const { data, files } = parseMultipartData(ctx);
-        //   entity = await strapi.services.restaurant.update({ id }, data, {
-        //     files,
-        //   });
-        // } else {
-        //     console.log(id, "<<<<<<<<");
-        //   entity = await strapi.services.order.update({ id }, ctx.request.body);
-        // }
-        
-        ctx.status = 400
-        ctx.body = {msg: 'helo'}
-        return ctx
-        // return sanitizeEntity("okee", { model: strapi.models.order });
-      },
+  async pay(ctx) {
+    try {
+      const { body } = ctx.request;
+      const { order_id: id } = body;
+      const entity = await strapi.services.order.findOne({ id });
+      if (!entity) {
+        ctx.status = 400;
+        ctx.body = { msg: "order id not found" };
+        return ctx;
+      }
+      const { total_amount, member } = entity;
+      const { name, email } = member;
+      const first_name = name.split(" ")[0];
+      const data = {
+        transaction_details: {
+          order_id: id,
+          gross_amount: total_amount,
+        },
+        credit_card: {
+          secure: true,
+        },
+        customer_details: {
+          first_name,
+          last_name: name.split(" ").slice(1).join(" "),
+          email,
+        },
+      };
+
+      const hit = await axios.post(env("MIDTRANS_SANDBOX_URL"), data, {
+        headers: {
+          Authorization: env("MIDTRANS_KEY"),
+        },
+      });
+
+      ctx.status = 200;
+      ctx.body = { msg: hit.data };
+      return ctx;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
