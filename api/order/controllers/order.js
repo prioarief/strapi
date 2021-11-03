@@ -38,7 +38,7 @@ module.exports = {
 
       const hit = await axios.post(env("MIDTRANS_SANDBOX_URL"), data, {
         headers: {
-          Authorization: env("MIDTRANS_KEY"),
+          Authorization: "Basic " + Buffer.from(env("MIDTRANS_KEY")).toString("base64"),
         },
       });
 
