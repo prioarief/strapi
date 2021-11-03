@@ -54,6 +54,7 @@ module.exports = {
   async callback(ctx) {
     try {
       const { body } = ctx.request;
+      const {transaction_status, order_id} = body
       console.log(body);
 
       ctx.status = 200;
