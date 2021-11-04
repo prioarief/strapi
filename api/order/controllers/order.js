@@ -58,8 +58,8 @@ module.exports = {
       const { transaction_status, order_id: id } = body;
       const is_paid = transaction_status === "settlement" ? true : false;
 
-      const entity = await strapi.service.order.update({ id }, { is_paid });
-      return sanitizeEntity(entity, { model: strapi.models.order });
+      const entity = await strapi.service.orders.update({ id }, { is_paid });
+      return sanitizeEntity(entity, { model: strapi.models.orders });
     } catch (error) {
       console.log(error);
     }
