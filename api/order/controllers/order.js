@@ -1,5 +1,5 @@
 "use strict";
-const { env } = require("strapi-utils");
+const { env, sanitizeEntity } = require("strapi-utils");
 const { default: axios } = require("axios");
 /**
  * Read the documentation (https://strapi.io/documentation/developer-docs/latest/development/backend-customization.html#core-controllers)
@@ -38,7 +38,8 @@ module.exports = {
 
       const hit = await axios.post(env("MIDTRANS_SANDBOX_URL"), data, {
         headers: {
-          Authorization: "Basic " + Buffer.from(env("MIDTRANS_KEY")).toString("base64"),
+          Authorization:
+            "Basic " + Buffer.from(env("MIDTRANS_KEY")).toString("base64"),
         },
       });
 
@@ -54,12 +55,11 @@ module.exports = {
   async callback(ctx) {
     try {
       const { body } = ctx.request;
-      const {transaction_status, order_id} = body
-      console.log(body);
+      const { transaction_status, order_id: id } = body;
+      const is_paid = transaction_status === "settlement" ? true : false;
 
-      ctx.status = 200;
-      ctx.body = { msg: "Hello" };
-      return ctx;
+      const entity = await strapi.service.order.update({ id }, { is_paid });
+      return sanitizeEntity(entity, { model: strapi.models.order });
     } catch (error) {
       console.log(error);
     }
